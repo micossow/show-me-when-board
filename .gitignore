@@ -1,0 +1,5 @@
+node_modules/
+dist/
+*.webm
+*.mp4
+recordings/

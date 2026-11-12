@@ -9,3 +9,14 @@ h1 { margin: 0; font-size: 22px; }
 .row.sev2 .sev { color: #a15c00; }
 .row time { color: #555; font-variant-numeric: tabular-nums; }
 footer { color: #777; font-size: 13px; }
+[hidden] { display: none !important; }
+.loader { padding: 24px 12px; color: #555; }
+.loader::before { content: ''; display: inline-block; width: 12px; height: 12px; margin-right: 8px; border: 2px solid #bbb; border-top-color: #333; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { color: #555; }
+.error { color: #b00020; }
+.row .act { min-width: 70px; text-align: right; }
+.row button { font: inherit; padding: 4px 12px; border: 1px solid #888; border-radius: 4px; background: #fff; cursor: pointer; }
+.row button:disabled { cursor: progress; opacity: .6; }
+.row .acked { color: #1b6e2e; font-weight: 600; }
+.row.is-acked { background: #f2f8f3; }
