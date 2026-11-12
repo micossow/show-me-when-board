@@ -6,8 +6,9 @@ const loader = document.querySelector('[data-testid="loader"]');
 const empty = document.querySelector('[data-testid="empty"]');
 const list = document.querySelector('[data-testid="incident-list"]');
 const errorBox = document.querySelector('.error');
+const newBar = document.querySelector('[data-testid="new-bar"]');
 
-/** Rows we have built, by incident id, so acked state survives refreshes. */
+/** Rows on the board, by incident id. */
 const rows = new Map();
 const acked = new Set();
 
@@ -74,30 +75,40 @@ function showError(err) {
   errorBox.hidden = false;
 }
 
-/** R1: newest first, new ones at the top. Existing rows are reused, not rebuilt. */
-function render(incidents) {
+/**
+ * R1 (as product decided after the step-1 recording): the list holds still while it is on screen.
+ * The first answer fills it; after that, incidents not on the board wait behind the "N new" bar and
+ * come in at the top only when on-call clicks it. Rows already on the board are never moved or removed.
+ */
+const pending = new Map();
+
+function addOnTop(incidents) {
   const sorted = [...incidents].sort((a, b) => Date.parse(b.openedAt) - Date.parse(a.openedAt));
-  const seen = new Set();
-  let prev = null;
+  const frag = document.createDocumentFragment();
   for (const i of sorted) {
-    seen.add(i.id);
-    let row = rows.get(i.id);
-    if (!row) {
-      row = buildRow(i);
-      rows.set(i.id, row);
-    }
-    const want = prev ? prev.nextSibling : list.firstChild;
-    if (want !== row) list.insertBefore(row, want);
-    prev = row;
+    const row = buildRow(i);
+    rows.set(i.id, row);
+    frag.append(row);
   }
-  for (const [id, row] of rows) {
-    if (!seen.has(id)) {
-      row.remove();
-      rows.delete(id);
-    }
-  }
-  empty.hidden = sorted.length > 0;
+  list.prepend(frag);
 }
+
+function render(incidents) {
+  const fresh = incidents.filter((i) => !rows.has(i.id));
+  if (rows.size === 0) addOnTop(fresh);
+  else for (const i of fresh) pending.set(i.id, i);
+  newBar.textContent = `${pending.size} new incident${pending.size === 1 ? '' : 's'} \u2014 show`;
+  newBar.hidden = pending.size === 0;
+  empty.hidden = rows.size > 0 || pending.size > 0;
+}
+
+newBar.addEventListener('click', () => {
+  addOnTop([...pending.values()]);
+  pending.clear();
+  newBar.hidden = true;
+  empty.hidden = rows.size > 0;
+  list.hidden = false;
+});
 
 let busy = false;
 async function refresh() {

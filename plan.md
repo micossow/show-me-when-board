@@ -13,7 +13,7 @@ what just broke and takes it.
 
 ## Requirements
 
-- **R1** New incidents appear live at the top of the list, newest first.
+- **R1** The list holds still while it is on screen. New incidents are announced live in a "N new" bar; a click on the bar brings them in at the top, newest first. Rows on the board are never moved or removed by a refresh. *(Changed 2026-11-12 by product after the step-1 recording, where a live insert moved INC-1779 under a click meant for INC-7143.)*
 - **R2** Each incident row has an **Ack** button. Ack sends the ack (`api.ack(id)`) and marks the row acked.
 - **R3** Show a loader until incidents load.
 - **R4** The board refreshes itself every 2 seconds while open.
@@ -29,6 +29,7 @@ what just broke and takes it.
 | `empty` | what shows when there are no incidents |
 | `incident-list` | the list |
 | `incident-row` | one incident row, with `data-id="<incident id>"` |
+| `new-bar` | the "N new" bar (shown only while new incidents wait; its slot keeps its height) |
 | `ack` | the Ack button in a row |
 | `acked` | the acked mark in a row |
 | `build-sha` | the sha in the footer |
